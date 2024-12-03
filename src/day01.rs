@@ -14,11 +14,11 @@ fn main() {
 
     // Part 1: Total distance
     let dist = calculate_total_distance(&list1, &list2);
-    println!("[Part 1] Total distance: {}", dist);
+    println!("[Part 1] {}", dist);
 
     // Part 2: Similarity index
     let similarity = calculate_similarity_index(&list1, &list2);
-    println!("[Part 2] Similarity index: {}", similarity);
+    println!("[Part 2] {}", similarity);
 }
 
 fn read_input(file_path: &str) -> Result<(Vec<u32>, Vec<u32>), Box<dyn std::error::Error>> {
