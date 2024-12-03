@@ -12,14 +12,11 @@ fn main() {
 
     // Part 1: Safe reports
     let num_safe_reports = count_safe_reports(&reports, false);
-    println!("[Part 1] Safe reports: {}", num_safe_reports);
+    println!("[Part 1] {}", num_safe_reports);
 
     // Part 2: Safe reports with Problem Dampener
     let num_safe_reports = count_safe_reports(&reports, true);
-    println!(
-        "[Part 2] Safe reports (with Problem Dampener): {}",
-        num_safe_reports
-    );
+    println!("[Part 2] {}", num_safe_reports);
 }
 
 fn read_input(file_path: &str) -> Result<Vec<Vec<u32>>, Box<dyn std::error::Error>> {

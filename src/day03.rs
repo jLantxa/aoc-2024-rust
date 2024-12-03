@@ -15,11 +15,11 @@ fn main() {
 
     // Part 1
     let value = process_str(&memory, false);
-    println!("[Part 1] Value: {}", value);
+    println!("[Part 1] {}", value);
 
     // Part 2
     let value = process_str(&memory, true);
-    println!("[Part 2] Value: {}", value);
+    println!("[Part 2] {}", value);
 }
 
 fn read_input(file_path: &str) -> Result<String, Box<dyn std::error::Error>> {
