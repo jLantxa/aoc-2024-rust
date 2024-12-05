@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
@@ -15,19 +16,15 @@ fn main() {
     let updates = &input.1;
 
     // Part 1: Do a first pass, process the correct updates and filter incorrect updates
-    let (part_1_value, first_pass_incorrect_updates) = process_updates(updates, rules);
+    let (part_1_value, mut second_updates) = process_updates(updates, rules);
     println!("[Part 1] {}", part_1_value);
 
     // Part 2: Fix incorrect updates and do a second processing
-    let first_pass_fixed_updates = first_pass_incorrect_updates
-        .iter()
-        .map(|u| fix_update(u, rules))
-        .collect();
-    let (part_2_value, second_pass_incorrect_updates) =
-        process_updates(&first_pass_fixed_updates, rules);
-    if !second_pass_incorrect_updates.is_empty() {
-        println!("Warning: Incorrect updates after the fix");
-    }
+    second_updates
+        .iter_mut()
+        .for_each(|u| sort_update(u, rules));
+
+    let (part_2_value, _) = process_updates(&second_updates, rules);
     println!("[Part 2] {}", part_2_value);
 }
 
@@ -57,8 +54,20 @@ fn check_update(update: &Update, rules: &Vec<OrderingRule>) -> Option<u8> {
     Some(update[mid_index])
 }
 
-fn fix_update(update: &Update, rules: &Vec<OrderingRule>) -> Update {
-    todo!()
+fn sort_update(update: &mut Update, rules: &Vec<OrderingRule>) {
+    update.sort_unstable_by(|lhs, rhs| {
+        // This assumes that there exists a rule for every pair of numbers
+        for rule in rules {
+            if rule.0 == *lhs && rule.1 == *rhs {
+                return Ordering::Less;
+            } else if rule.0 == *rhs && rule.1 == *lhs {
+                return Ordering::Greater;
+            }
+        }
+
+        // Need some default if no rule exists, which will never happen
+        Ordering::Greater
+    });
 }
 
 fn process_updates(updates: &Vec<Update>, rules: &Vec<OrderingRule>) -> (u32, Vec<Update>) {
