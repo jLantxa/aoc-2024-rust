@@ -28,46 +28,32 @@ fn main() {
     println!("[Part 2] {}", part_2_value);
 }
 
-fn check_update(update: &Update, rules: &Vec<OrderingRule>) -> Option<u8> {
-    if update.is_empty() {
-        return None;
-    }
-
-    let mid_index = update.len() / 2;
-
+fn compare(lhs: u8, rhs: u8, rules: &Vec<OrderingRule>) -> Ordering {
+    // This assumes that there exists a rule for every pair of numbers
     for rule in rules {
-        let first = update.iter().position(|&n| n == rule.0);
-        let second = update.iter().position(|&n| n == rule.1);
-
-        if first.is_none() || second.is_none() {
-            continue;
-        }
-
-        let first = first.unwrap();
-        let second = second.unwrap();
-
-        if first > second {
-            return None;
+        if rule.0 == lhs && rule.1 == rhs {
+            return Ordering::Less;
+        } else if rule.0 == rhs && rule.1 == lhs {
+            return Ordering::Greater;
         }
     }
 
-    Some(update[mid_index])
+    // Need some default if no rule exists, which will never happen
+    Ordering::Greater
+}
+
+fn check_update(update: &Update, rules: &Vec<OrderingRule>) -> Option<u8> {
+    let is_sorted = update.is_sorted_by(|lhs, rhs| compare(*lhs, *rhs, rules) == Ordering::Less);
+    if is_sorted {
+        let median_index = update.len() / 2;
+        Some(update[median_index])
+    } else {
+        None
+    }
 }
 
 fn sort_update(update: &mut Update, rules: &Vec<OrderingRule>) {
-    update.sort_unstable_by(|lhs, rhs| {
-        // This assumes that there exists a rule for every pair of numbers
-        for rule in rules {
-            if rule.0 == *lhs && rule.1 == *rhs {
-                return Ordering::Less;
-            } else if rule.0 == *rhs && rule.1 == *lhs {
-                return Ordering::Greater;
-            }
-        }
-
-        // Need some default if no rule exists, which will never happen
-        Ordering::Greater
-    });
+    update.sort_unstable_by(|lhs, rhs| compare(*lhs, *rhs, rules));
 }
 
 fn process_updates(updates: &Vec<Update>, rules: &Vec<OrderingRule>) -> (u32, Vec<Update>) {
