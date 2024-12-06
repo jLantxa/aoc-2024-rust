@@ -1,8 +1,7 @@
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use std::collections::HashSet;
 
 const INPUT_FILE: &str = "input/day06.txt";
-
-type Direction = (i32, i32);
 
 const CELL_OBSTACLE: char = '#';
 const CELL_GUARD_UP: char = '^';
@@ -14,6 +13,13 @@ const UP: Direction = (0, -1);
 const RIGHT: Direction = (1, 0);
 const DOWN: Direction = (0, 1);
 const LEFT: Direction = (-1, 0);
+
+type Position = (i32, i32);
+type Direction = (i32, i32);
+
+fn turn_right(dir: &Direction) -> Direction {
+    (-dir.1, dir.0)
+}
 
 #[derive(Debug, Clone)]
 struct Map {
@@ -40,20 +46,22 @@ impl Map {
         Self::from_string(&std::fs::read_to_string(file_name)?)
     }
 
-    fn at(&self, i: i32, j: i32) -> char {
-        self.block[j as usize][i as usize]
+    fn at(&self, pos: Position) -> char {
+        self.block[pos.1 as usize][pos.0 as usize]
     }
 
     fn dimensions(&self) -> (i32, i32) {
         (self.block[0].len() as i32, self.block.len() as i32)
     }
 
-    fn is_inside(&self, i: i32, j: i32) -> bool {
+    fn is_inside(&self, position: Position) -> bool {
         let dimensions = self.dimensions();
-        (i >= 0 && i < dimensions.0) && (j >= 0 && j < dimensions.1)
+        (position.0 >= 0 && position.0 < dimensions.0)
+            && (position.1 >= 0 && position.1 < dimensions.1)
     }
 
-    fn get_visited_positions(&self) -> HashSet<(i32, i32)> {
+    // Returns a HashSet with all the positions visited by the guard.
+    fn get_visited_positions(&self) -> HashSet<Position> {
         let mut visited_positions = HashSet::new();
         let (mut pos, mut dir) = self.find_guard().expect("Expected a guard");
 
@@ -61,23 +69,24 @@ impl Map {
             visited_positions.insert((pos.0, pos.1));
 
             let next_pos = (pos.0 + dir.0, pos.1 + dir.1);
-            if !self.is_inside(next_pos.0, next_pos.1) {
+            if !self.is_inside(next_pos) {
                 break;
-            } else if self.at(next_pos.0, next_pos.1) == CELL_OBSTACLE {
+            } else if self.at(next_pos) == CELL_OBSTACLE {
                 dir = turn_right(&dir);
+            } else {
+                pos.0 += dir.0;
+                pos.1 += dir.1;
             }
-
-            pos.0 += dir.0;
-            pos.1 += dir.1;
         }
 
         visited_positions
     }
 
-    fn find_guard(&self) -> Option<((i32, i32), Direction)> {
+    // Find the guard and its direction in the map.
+    fn find_guard(&self) -> Option<(Position, Direction)> {
         for (j, row) in self.block.iter().enumerate() {
             for (i, _) in row.iter().enumerate() {
-                let ch = self.at(i as i32, j as i32);
+                let ch = self.at((i as i32, j as i32));
                 let pos = (i as i32, j as i32);
                 match ch {
                     CELL_GUARD_UP => return Some((pos, UP)),
@@ -91,20 +100,56 @@ impl Map {
 
         None
     }
+
+    // Calculate how many different obstacles in the map make the guard loop.
+    fn calculate_posible_obstacles(&self) -> (usize, usize) {
+        let visited_positions = self.get_visited_positions();
+        let num_posible_obstacles = visited_positions
+            .par_iter() // Parallel iterator
+            .filter(|&position| self.check_obstacle(*position))
+            .count();
+
+        (visited_positions.len(), num_posible_obstacles)
+    }
+
+    // Check if an obstacle produces a loop
+    fn check_obstacle(&self, obstacle_pos: (i32, i32)) -> bool {
+        let (mut pos, mut dir) = self.find_guard().expect("Expected a guard");
+        if pos == obstacle_pos {
+            return false;
+        }
+
+        let mut past_positions: HashSet<(Position, Direction)> = HashSet::new();
+        loop {
+            if past_positions.contains(&(pos, dir)) {
+                return true;
+            }
+
+            past_positions.insert((pos, dir));
+
+            let next_position = (pos.0 + dir.0, pos.1 + dir.1);
+            if !self.is_inside(next_position) {
+                break;
+            } else if (next_position == obstacle_pos) || (self.at(next_position) == CELL_OBSTACLE) {
+                dir = turn_right(&dir);
+            } else {
+                pos.0 += dir.0;
+                pos.1 += dir.1;
+            }
+        }
+
+        false
+    }
 }
 
 fn main() {
     println!("Day 6");
 
     let map: Map = Map::from_file(INPUT_FILE).expect("Could not read the input");
+    let (num_visited_positions, num_posible_obstacles) = map.calculate_posible_obstacles();
 
-    // Part 1
-    let visited_positions = map.get_visited_positions();
-    println!("[Part 1] {}", visited_positions.len());
-}
-
-fn turn_right(dir: &Direction) -> Direction {
-    (-dir.1, dir.0)
+    println!("[Part 1] {}", num_visited_positions);
+    println!("[Part 2] {}", num_posible_obstacles);
 }
 
 #[test]
@@ -122,6 +167,7 @@ fn test_example() {
                       ";
     let map = Map::from_string(MAP).expect("Could not read map");
 
-    let visited_positions = map.get_visited_positions();
-    assert_eq!(visited_positions.len(), 41);
+    let (visited_positions, num_obstacles) = map.calculate_posible_obstacles();
+    assert_eq!(visited_positions, 41);
+    assert_eq!(num_obstacles, 6);
 }
