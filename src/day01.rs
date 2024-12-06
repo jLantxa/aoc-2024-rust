@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
+use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
+
 const INPUT_FILE: &str = "input/day01.txt";
 
 fn main() {
@@ -58,8 +60,8 @@ fn calculate_total_distance(list1: &[u32], list2: &[u32]) -> u32 {
     sorted2.sort_unstable();
 
     sorted1
-        .iter()
-        .zip(sorted2.iter())
+        .par_iter()
+        .zip(sorted2.par_iter())
         .map(|(a, b)| a.abs_diff(*b))
         .sum()
 }
@@ -69,7 +71,7 @@ fn calculate_similarity_index(list1: &[u32], list2: &[u32]) -> u32 {
     let count2 = count_elements(list2);
 
     count1
-        .iter()
+        .par_iter()
         .map(|(&id, &count1)| {
             let count2 = count2.get(&id).copied().unwrap_or(0);
             id * (count1 * count2) as u32

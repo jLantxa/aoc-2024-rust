@@ -3,6 +3,10 @@ use std::{
     io::{BufRead, BufReader},
 };
 
+use rayon::iter::{
+    IndexedParallelIterator, IntoParallelIterator, IntoParallelRefIterator, ParallelIterator,
+};
+
 const INPUT_FILE: &str = "input/day02.txt";
 
 fn main() {
@@ -59,7 +63,7 @@ fn is_report_safe_with_dampener(report: &[u32]) -> bool {
     for drop_index in 0..=report.len() {
         let report_drop: Vec<u32> = report
             .to_vec()
-            .into_iter()
+            .into_par_iter()
             .enumerate()
             .filter(|&(index, _)| index != drop_index)
             .map(|(_, value)| value)
@@ -91,12 +95,12 @@ fn check_levels(l0: u32, l1: u32, current_diff: i32) -> (bool, i32) {
 fn count_safe_reports(reports: &Vec<Vec<u32>>, use_problem_dampener: bool) -> usize {
     if use_problem_dampener {
         reports
-            .iter()
+            .par_iter()
             .filter(|report| is_report_safe_with_dampener(report))
             .count()
     } else {
         reports
-            .iter()
+            .par_iter()
             .filter(|report| is_report_safe(report))
             .count()
     }

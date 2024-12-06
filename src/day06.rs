@@ -1,5 +1,6 @@
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use std::collections::HashSet;
+
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 const INPUT_FILE: &str = "input/day06.txt";
 

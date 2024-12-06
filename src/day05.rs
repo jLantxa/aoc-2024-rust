@@ -2,6 +2,8 @@ use std::cmp::Ordering;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+
 const INPUT_FILE: &str = "input/day05.txt";
 
 type OrderingRule = (u8, u8);
@@ -101,7 +103,7 @@ fn read_input(
         let elements: Vec<&str> = line_unwrapped.split(",").collect();
         updates.push(
             elements
-                .iter()
+                .par_iter()
                 .map(|s| s.parse().expect("Could not parse value into integer"))
                 .collect(),
         );
