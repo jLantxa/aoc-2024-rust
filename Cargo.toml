@@ -27,6 +27,13 @@ path = "src/day05.rs"
 name = "day06"
 path = "src/day06.rs"
 
+[[bin]]
+name = "day07"
+path = "src/day07.rs"
+
 [dependencies]
+itertools = "0.13.0"
 rayon = "1.10.0"
 regex = "1.11.1"
+strum = { version = "0.26.3", features = ["derive"] }
+strum_macros = "0.26.3"
