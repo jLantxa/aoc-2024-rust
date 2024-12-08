@@ -4,12 +4,12 @@ use std::path::Path;
 use std::{fs, isize};
 
 #[derive(Debug, Clone)]
-pub struct CharBlock {
+pub struct Grid {
     block: Vec<Vec<char>>,
 }
 
-impl CharBlock {
-    /// Creates a new CharBlock from a 2D vector of characters.
+impl Grid {
+    /// Creates a new Grid from a 2D vector of characters.
     pub fn new(block: Vec<Vec<char>>) -> Self {
         Self { block }
     }
@@ -38,7 +38,7 @@ impl CharBlock {
         self.block.iter().flat_map(|row| row.iter().copied())
     }
 
-    /// Reads a CharBlock from a string, splitting rows by newlines.
+    /// Reads a Grid from a string, splitting rows by newlines.
     pub fn from_string(input: &str) -> Self {
         let block = input
             .lines()
@@ -47,13 +47,13 @@ impl CharBlock {
         Self::new(block)
     }
 
-    /// Reads a CharBlock from a file.
+    /// Reads a Grid from a file.
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
         let content = fs::read_to_string(path)?;
         Ok(Self::from_string(&content))
     }
 
-    /// Converts the CharBlock back into a string representation.
+    /// Converts the Grid back into a string representation.
     pub fn to_string(&self) -> String {
         self.block
             .iter()
