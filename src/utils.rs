@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use std::fs;
 use std::path::Path;
+use std::{fs, isize};
 
 #[derive(Debug, Clone)]
 pub struct CharBlock {
@@ -67,5 +67,10 @@ impl CharBlock {
         let rows = self.block.len();
         let columns = self.block.get(0).map_or(0, |row| row.len());
         (columns, rows)
+    }
+
+    pub fn is_inside(&self, i: isize, j: isize) -> bool {
+        let dim = self.dimensions();
+        (i >= 0) && (i < dim.0 as isize) && (j >= 0) && (j < dim.1 as isize)
     }
 }

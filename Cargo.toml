@@ -3,6 +3,13 @@ name = "aoc-2024-rust"
 version = "0.1.0"
 edition = "2021"
 
+[dependencies]
+itertools = "0.13.0"
+rayon = "1.10.0"
+regex = "1.11.1"
+strum = { version = "0.26.3", features = ["derive"] }
+strum_macros = "0.26.3"
+
 [[bin]]
 name = "day01"
 path = "src/day01.rs"
@@ -31,9 +38,6 @@ path = "src/day06.rs"
 name = "day07"
 path = "src/day07.rs"
 
-[dependencies]
-itertools = "0.13.0"
-rayon = "1.10.0"
-regex = "1.11.1"
-strum = { version = "0.26.3", features = ["derive"] }
-strum_macros = "0.26.3"
+[[bin]]
+name = "day08"
+path = "src/day08.rs"
