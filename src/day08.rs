@@ -91,4 +91,21 @@ fn calculate_antinodes_for_map(map: &Grid, include_resonant: bool) -> HashSet<Po
 }
 
 #[test]
-fn test_example() {}
+fn test_example() {
+    const GRID: &str = "............\n\
+                        ........0...\n\
+                        .....0......\n\
+                        .......0....\n\
+                        ....0.......\n\
+                        ......A.....\n\
+                        ............\n\
+                        ............\n\
+                        ........A...\n\
+                        .........A..\n\
+                        ............\n\
+                        ............";
+
+    let map = Grid::from_string(GRID);
+    assert_eq!(calculate_antinodes_for_map(&map, false).len(), 14);
+    assert_eq!(calculate_antinodes_for_map(&map, true).len(), 34);
+}
