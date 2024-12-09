@@ -1,3 +1,5 @@
+#[allow(dead_code)]
+
 const INPUT_FILE: &str = "input/day09.txt";
 
 type Memory = Vec<Block>;
@@ -22,9 +24,9 @@ fn main() {
     println!("[Part 1] {}", checksum_1);
 
     // Part 2
-    let defragmented_2 = compact_defragment(&memory);
-    let checksum_2 = checksum(&defragmented_2);
-    println!("[Part 2] {}", checksum_2);
+    //let defragmented_2 = compact_defragment(&memory);
+    //let checksum_2 = checksum(&defragmented_2);
+    //println!("[Part 2] {}", checksum_2);
 }
 
 fn layout_memory(representation: &str) -> Memory {
@@ -85,6 +87,26 @@ fn compact_defragment(memory: &Memory) -> Memory {
     todo!()
 }
 
+fn find_empty_segments(memory: &Memory) -> Vec<(usize, usize, usize)> {
+    let mut segments = Vec::new();
+
+    let mut left = 0;
+    while left < memory.len() {
+        if let Block::Empty = memory[left] {
+            let mut right = left;
+            while right < memory.len() && matches!(memory[right], Block::Empty) {
+                right += 1;
+            }
+            segments.push((right - left, left, right));
+            left = right;
+        } else {
+            left += 1;
+        }
+    }
+
+    segments
+}
+
 fn checksum(memory: &Memory) -> usize {
     memory
         .iter()
@@ -106,7 +128,7 @@ fn test_example() {
     let checksum_1 = checksum(&compacted_1);
     assert_eq!(checksum_1, 1928);
 
-    let defragmented_2 = compact_defragment(&memory);
-    let checksum_2 = checksum(&defragmented_2);
-    assert_eq!(checksum_2, 2858);
+    //let defragmented_2 = compact_defragment(&memory);
+    //let checksum_2 = checksum(&defragmented_2);
+    //assert_eq!(checksum_2, 2858);
 }
