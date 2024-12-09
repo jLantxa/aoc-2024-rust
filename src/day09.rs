@@ -85,6 +85,26 @@ fn compact_defragment(memory: &Memory) -> Memory {
     todo!()
 }
 
+fn find_empty_segments(memory: &Memory) -> Vec<(usize, usize, usize)> {
+    let mut segments = Vec::new();
+
+    let mut left = 0;
+    while left < memory.len() {
+        if let Block::Empty = memory[left] {
+            let mut right = left;
+            while right < memory.len() && matches!(memory[right], Block::Empty) {
+                right += 1;
+            }
+            segments.push((right - left, left, right));
+            left = right;
+        } else {
+            left += 1;
+        }
+    }
+
+    segments
+}
+
 fn checksum(memory: &Memory) -> usize {
     memory
         .iter()
