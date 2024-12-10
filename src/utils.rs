@@ -33,6 +33,11 @@ impl Grid {
         self.block.iter()
     }
 
+    /// Iterates over the characters row by row.
+    pub fn iter_rows_enumerate(&self) -> impl Iterator<Item = (usize, &Vec<char>)> {
+        self.block.iter().enumerate()
+    }
+
     /// Iterates over all characters in the block, row by row.
     pub fn iter_chars(&self) -> impl Iterator<Item = char> + '_ {
         self.block.iter().flat_map(|row| row.iter().copied())
