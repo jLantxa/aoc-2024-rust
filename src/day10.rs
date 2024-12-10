@@ -1,5 +1,4 @@
-use std::collections::HashSet;
-use std::collections::VecDeque;
+use std::collections::{HashSet, VecDeque};
 use std::iter::FromIterator;
 
 const INPUT_FILE: &str = "input/day10.txt";
@@ -33,34 +32,30 @@ fn parse_input(file_path: &str) -> Result<Map, Box<dyn std::error::Error>> {
     Ok(parse_map(&input))
 }
 
-fn inside_map(i: isize, j: isize, map: &Map) -> bool {
-    let width = map[0].len() as isize;
-    let height = map.len() as isize;
-
-    (i >= 0) && (i < width) && (j >= 0) && (j < height)
-}
-
 fn bfs_trailhead(map: &Map, start: (isize, isize)) -> Vec<(isize, isize)> {
-    let mut queue = VecDeque::new();
-
-    queue.push_back((start, 0));
-
     let mut endpoints = Vec::new();
+
+    let map_width = map[0].len() as isize;
+    let map_height = map.len() as isize;
+
+    let mut queue = VecDeque::with_capacity(9);
+    queue.push_back((start, 0));
 
     while let Some(((i, j), height)) = queue.pop_front() {
         for (di, dj) in DIRECTIONS {
-            let next = (i as isize + di, j as isize + dj);
+            let ni = i as isize + di;
+            let nj = j as isize + dj;
 
-            if !inside_map(next.0, next.1, map) {
+            if (ni < 0) || (ni >= map_width) || (nj < 0) || (nj >= map_height) {
                 continue;
             }
 
-            let next_height = map[next.0 as usize][next.1 as usize];
+            let next_height = map[ni as usize][nj as usize];
             if next_height == height + 1 {
                 if next_height == 9 {
-                    endpoints.push(next);
+                    endpoints.push((ni, nj));
                 } else {
-                    queue.push_back((next, next_height));
+                    queue.push_back(((ni, nj), next_height));
                 }
             }
         }
